@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
@@ -13,7 +14,7 @@ from app.api.deps import (
     UserServiceDep,
     require_consent,
 )
-from app.api.schemas import PersonalDataReport, PhoneShareRequest, ProfileUpdate, UserView
+from app.api.schemas import PersonalDataReport, PhoneShareRequest, ProfileUpdate, RoleUpdate, UserView
 from app.api.v1.auth import consent_states
 from app.core.errors import ConflictError, ForbiddenError
 from app.db.models import (
@@ -77,6 +78,34 @@ async def share_phone(
         raise ConflictError("Не удалось подтвердить номер телефона через MAX")
     if not await users.store_phone(user, payload.phone, source="miniapp"):
         raise ConflictError("Некорректный номер телефона")
+    await session.commit()
+    return UserView.from_user(user)
+
+
+@router.patch("/me/role", response_model=UserView, summary="Выбрать роль в сервисе")
+async def choose_role(
+    payload: RoleUpdate,
+    request: RequestContextDep,
+    user: CurrentUser,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> UserView:
+    if user.role == UserRole.administrator:
+        raise ForbiddenError("Роль администратора назначается оператором системы")
+    selected = UserRole(payload.role)
+    if user.role != UserRole.student or user.role_confirmed_at is not None:
+        raise ConflictError("Роль уже выбрана, изменить её можно через поддержку школы")
+    user.role = selected
+    user.role_confirmed_at = datetime.now(UTC)
+    await AuditService(session, settings).record(
+        "user.role_selected",
+        actor_user_id=user.id,
+        entity_type="user",
+        entity_id=str(user.id),
+        outcome=selected.value,
+        ip=request.ip,
+        user_agent=request.user_agent,
+    )
     await session.commit()
     return UserView.from_user(user)
 

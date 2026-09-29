@@ -76,6 +76,7 @@ class UserView(ORMModel):
     username: str | None = None
     locale: str
     grade: int | None = None
+    role_confirmed: bool = False
     is_active: bool
     has_phone: bool = False
     has_email: bool = False
@@ -91,6 +92,7 @@ class UserView(ORMModel):
             username=user.username,
             locale=user.locale,
             grade=user.grade,
+            role_confirmed=user.role_confirmed_at is not None,
             is_active=user.is_active,
             has_phone=bool(user.phone_index),
             has_email=bool(user.email_index),
@@ -102,6 +104,10 @@ class PhoneShareRequest(BaseModel):
     phone: str = Field(min_length=10, max_length=20)
     auth_date: str = Field(min_length=8, max_length=20)
     hash: str = Field(min_length=32, max_length=128)
+
+
+class RoleUpdate(BaseModel):
+    role: Literal["student", "parent", "teacher"]
 
 
 class ProfileUpdate(BaseModel):

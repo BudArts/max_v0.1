@@ -29,7 +29,7 @@ from app.services.users import UserService
 log = get_logger(__name__)
 
 GREETING = (
-    "Привет! Это «УчусьИИ» — ИИ-наставник по математике и физике.\n\n"
+    "Привет! Это «Учусь.ai» — ИИ-наставник по математике и физике.\n\n"
     "Пришли фото задачи или напиши её текстом. Я не даю готовых ответов: наводящими вопросами "
     "помогу дойти до решения самому. Родители и учителя видят аналитику в личном кабинете."
 )
@@ -59,7 +59,7 @@ CONSENT_DECLINED = (
 MENU_TITLE = "Выберите раздел"
 
 HELP_TEXT = (
-    "Как работает «УчусьИИ»\n\n"
+    "Как работает «Учусь.ai»\n\n"
     "1. Пришлите фото задачи или напишите её текстом.\n"
     "2. Наставник не даёт готовый ответ, а задаёт наводящие вопросы.\n"
     "3. Отвечайте шаг за шагом — обычно хватает 3-5 шагов.\n"
@@ -281,6 +281,8 @@ async def _on_callback(
         grade = int(parts[1])
         if 5 <= grade <= 11:
             user.grade = grade
+            if user.role_confirmed_at is None:
+                user.role_confirmed_at = datetime.now(UTC)
             notification = f"Класс {grade}"
             await _send(
                 runtime,

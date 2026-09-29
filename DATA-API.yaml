@@ -3,7 +3,7 @@
 # она же доступна на работающем сервере по адресу /openapi.json.
 
 name: uchusai-api
-title: УчусьИИ — API ИИ-наставника школьника (мессенджер MAX)
+title: Учусь.ai — API ИИ-наставника школьника (мессенджер MAX)
 version: 0.1.0
 format: OpenAPI 3.1
 specification: ./openapi.yaml

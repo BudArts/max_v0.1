@@ -22,7 +22,7 @@ function StudentHome(): JSX.Element {
 
   return (
     <div className="stack">
-      <Card title={`Привет, ${user?.first_name ?? 'ученик'}!`} hint="ИИ-наставник по математике и физике">
+      <Card title={`Привет, ${user?.first_name ?? 'ученик'}!`} hint="ИИ-наставник «Учусь.ai» по математике и физике">
         <div className="stack">
           <p className="muted">
             Пришли боту фото задачи или её текст — наставник задаст наводящие вопросы и доведёт до

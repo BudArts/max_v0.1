@@ -5,7 +5,7 @@ export function UnavailablePage({ reason, onRetry }: { reason: string | null; on
   return (
     <div className="app">
       <header className="app__header">
-        <div className="app__title">Обращения</div>
+        <div className="app__title">Учусь.ai</div>
       </header>
       <main className="app__content app__content--flush">
         <div className="stack">

@@ -53,6 +53,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     role: Mapped[UserRole] = mapped_column(
         pg_enum(UserRole, "user_role"), default=UserRole.parent, nullable=False
     )
+    role_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     phone_encrypted: Mapped[str | None] = mapped_column(Text)
     phone_index: Mapped[str | None] = mapped_column(String(64))

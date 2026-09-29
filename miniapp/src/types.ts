@@ -13,6 +13,7 @@ export interface UserView {
   username: string | null;
   locale: string;
   grade?: number | null;
+  role_confirmed: boolean;
   is_active: boolean;
   has_phone: boolean;
   has_email: boolean;

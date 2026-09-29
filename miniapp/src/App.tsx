@@ -8,6 +8,7 @@ import { HomePage } from './pages/Home';
 import { LegalDocumentPage, LegalListPage } from './pages/Legal';
 import { ParentLinkPage, ParentChildrenPage, ChildDigestPage } from './pages/Parent';
 import { PersonalDataPage } from './pages/PersonalData';
+import { RoleChoicePage } from './pages/RoleChoice';
 import { SettingsPage } from './pages/Settings';
 import { TeacherRiskPage } from './pages/Teacher';
 import { TaskDetailPage } from './pages/TaskDetail';
@@ -25,7 +26,9 @@ function RoleGate({ allow, children }: { allow: Role[]; children: JSX.Element })
 }
 
 function Cabinet(): JSX.Element {
-  const { status, failure, signIn, onboardingRequired } = useSession();
+  const { status, failure, signIn, onboardingRequired, user } = useSession();
+  const roleChoiceRequired =
+    status === 'authenticated' && !onboardingRequired && !!user && !user.role_confirmed && user.role !== 'administrator';
 
   if (status === 'loading') {
     return (
@@ -51,6 +54,8 @@ function Cabinet(): JSX.Element {
         <Route path="/legal/:code" element={<LegalDocumentPage />} />
         {onboardingRequired ? (
           <Route path="*" element={<Navigate to="/consent" replace />} />
+        ) : roleChoiceRequired ? (
+          <Route path="*" element={<RoleChoicePage />} />
         ) : (
           <>
             <Route path="/" element={<HomePage />} />

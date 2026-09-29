@@ -22,7 +22,7 @@ const TABS: Tab[] = [
 ];
 
 const TITLES: Record<string, { title: string; subtitle?: string }> = {
-  '/': { title: 'УчусьИИ' },
+  '/': { title: 'Учусь.ai' },
   '/tasks': { title: 'Мои задачи' },
   '/parent': { title: 'Мои дети' },
   '/parent/link': { title: 'Привязка ребёнка' },
@@ -42,7 +42,7 @@ export function AppShell(): JSX.Element {
   const matched = Object.keys(TITLES)
     .filter((path) => location.pathname === path || (path !== '/' && location.pathname.startsWith(path)))
     .sort((a, b) => b.length - a.length)[0];
-  const heading = (matched ? TITLES[matched] : undefined) ?? { title: 'УчусьИИ' };
+  const heading = (matched ? TITLES[matched] : undefined) ?? { title: 'Учусь.ai' };
   const detail =
     location.pathname.startsWith('/tasks/') || location.pathname.startsWith('/parent/child/');
 
@@ -67,7 +67,7 @@ export function AppShell(): JSX.Element {
           </button>
         )}
         <div className="grow">
-          <div className="app__title">{detail ? 'Обращение' : heading.title}</div>
+          <div className="app__title">{heading.title}</div>
           {user && (
             <div className="app__subtitle">
               {formatInitials(user.first_name, user.last_name)} · {roleLabel(role)}

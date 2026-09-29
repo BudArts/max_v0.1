@@ -15,7 +15,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    app_name: str = "УчусьИИ"
+    app_name: str = "Учусь.ai"
     app_env: Literal["development", "staging", "production"] = "production"
     app_debug: bool = False
     app_base_url: str = "https://localhost"
@@ -46,9 +46,9 @@ class Settings(BaseSettings):
 
     gigachat_credentials: str = Field(default="", repr=False)
     gigachat_scope: str = "GIGACHAT_API_PERS"
-    gigachat_model: str = "GigaChat-2"
+    gigachat_model: str = "GigaChat"
     gigachat_auth_url: str = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
-    gigachat_base_url: str = "https://api.giga.chat/v1"
+    gigachat_base_url: str = "https://gigachat.devices.sberbank.ru/api/v1"
     gigachat_verify_ssl: bool = True
     gigachat_ca_bundle: str = ""
     gigachat_timeout: int = 45

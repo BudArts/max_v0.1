@@ -157,7 +157,12 @@ class GigaChatClient:
                 continue
 
             if response.status_code != 200:
-                log.error("gigachat_completion_failed", status=response.status_code)
+                log.error(
+                    "gigachat_completion_failed",
+                    status=response.status_code,
+                    body=response.text[:400],
+                    model=self._settings.gigachat_model,
+                )
                 raise GigaChatError(f"GigaChat вернул {response.status_code}")
 
             return self._parse(response.json())

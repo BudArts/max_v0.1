@@ -34,7 +34,7 @@ SYSTEM_GRADE_HINT = (
 )
 
 DIGEST_TEMPLATE = (
-    "Дайджест «УчусьИИ» за неделю, {student}:\n"
+    "Дайджест «Учусь.ai» за неделю, {student}:\n"
     "Задач начато: {started}, решено: {solved}.\n"
     "Темы недели: {topics}.\n"
     "{advice}"

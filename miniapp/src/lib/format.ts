@@ -48,8 +48,8 @@ export function plural(count: number, one: string, few: string, many: string): s
   return many;
 }
 
-export function appealsWord(count: number): string {
-  return `${count} ${plural(count, 'обращение', 'обращения', 'обращений')}`;
+export function tasksWord(count: number): string {
+  return `${count} ${plural(count, 'задача', 'задачи', 'задач')}`;
 }
 
 export function truncate(value: string, limit = 140): string {

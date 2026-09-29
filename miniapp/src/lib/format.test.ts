@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { appealsWord, formatDate, formatDateTime, formatInitials, plural, truncate } from './format';
+import { tasksWord, formatDate, formatDateTime, formatInitials, plural, truncate } from './format';
 
 describe('plural', () => {
   it('выбирает форму по правилам русского языка', () => {
-    expect(plural(1, 'обращение', 'обращения', 'обращений')).toBe('обращение');
-    expect(plural(2, 'обращение', 'обращения', 'обращений')).toBe('обращения');
-    expect(plural(5, 'обращение', 'обращения', 'обращений')).toBe('обращений');
-    expect(plural(11, 'обращение', 'обращения', 'обращений')).toBe('обращений');
-    expect(plural(21, 'обращение', 'обращения', 'обращений')).toBe('обращение');
-    expect(plural(104, 'обращение', 'обращения', 'обращений')).toBe('обращения');
+    expect(plural(1, 'задача', 'задачи', 'задач')).toBe('задача');
+    expect(plural(2, 'задача', 'задачи', 'задач')).toBe('задачи');
+    expect(plural(5, 'задача', 'задачи', 'задач')).toBe('задач');
+    expect(plural(11, 'задача', 'задачи', 'задач')).toBe('задач');
+    expect(plural(21, 'задача', 'задачи', 'задач')).toBe('задача');
+    expect(plural(104, 'задача', 'задачи', 'задач')).toBe('задачи');
   });
 
-  it('формирует счётчик обращений', () => {
-    expect(appealsWord(0)).toBe('0 обращений');
-    expect(appealsWord(3)).toBe('3 обращения');
+  it('формирует счётчик задач', () => {
+    expect(tasksWord(0)).toBe('0 задач');
+    expect(tasksWord(3)).toBe('3 задачи');
   });
 });
 

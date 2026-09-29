@@ -96,8 +96,6 @@ async def current_user(
     user = await session.get(User, user_id)
     if user is None or not user.is_active:
         raise UnauthorizedError("Учётная запись недоступна")
-    if user.role != UserRole(claims.get("role", user.role.value)) and user.role != UserRole.administrator:
-        raise UnauthorizedError("Сессия устарела, войдите заново")
     return user
 
 

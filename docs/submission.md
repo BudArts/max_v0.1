@@ -24,7 +24,7 @@ git push -u team main
 ```bash
 unzip <архив>.zip -d uchusai && cd uchusai
 git init -b main
-git add -A && git commit -m "УчусьИИ: ИИ-наставник школьника в MAX"
+git add -A && git commit -m "Учусь.ai: ИИ-наставник школьника в MAX"
 git remote add origin https://github.com/<команда>/uchusai.git
 git push -u origin main
 ```

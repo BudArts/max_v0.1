@@ -215,7 +215,7 @@ class TaskService:
             .join(Task, Task.user_id == User.id)
             .where(
                 User.role == "student",
-                Task.status == TaskStatus.active,
+                Task.status.in_([TaskStatus.active, TaskStatus.abandoned]),
                 Task.started_at >= week_ago,
             )
             .group_by(User.id)
@@ -230,7 +230,7 @@ class TaskService:
                 continue
             topics_rows = await self._session.execute(
                 select(Task.topic)
-                .where(Task.user_id == user.id, Task.status == TaskStatus.active)
+                .where(Task.user_id == user.id, Task.status.in_([TaskStatus.active, TaskStatus.abandoned]))
                 .order_by(Task.started_at.desc())
                 .limit(5)
             )

@@ -239,6 +239,7 @@ DEMO_CLASSES = (
             (9_100_101, "Артём", "Ковалёв"),
             (9_100_102, "Софья", "Маркова"),
             (9_100_103, "Илья", "Дёмин"),
+            (9_100_104, "Никита", "Орлов"),
         ),
     ),
     DemoClass(
@@ -249,6 +250,7 @@ DEMO_CLASSES = (
         students=(
             (9_100_201, "Вера", "Носова"),
             (9_100_202, "Матвей", "Ершов"),
+            (9_100_203, "Анна", "Смирнова"),
         ),
     ),
 )
@@ -269,6 +271,12 @@ DEMO_PARENTS = (
 
 
 @dataclass(frozen=True, slots=True)
+class DemoDialog:
+    author: str
+    content: str
+
+
+@dataclass(frozen=True, slots=True)
 class DemoTask:
     student_max_id: int
     subject: TaskSubject
@@ -276,8 +284,7 @@ class DemoTask:
     status: TaskStatus
     steps: int
     age_days: int
-    problem: str
-    first_question: str
+    messages: tuple[DemoDialog, ...]
 
 
 DEMO_TASKS = (
@@ -288,38 +295,181 @@ DEMO_TASKS = (
         TaskStatus.solved,
         4,
         3,
-        "Катеты прямоугольного треугольника 3 и 4, найдите гипотенузу",
-        "Что дано в задаче и что нужно найти?",
+        (
+            DemoDialog("student", "Катеты прямоугольного треугольника 3 см и 4 см, найдите гипотенузу"),
+            DemoDialog(
+                "tutor",
+                "Давай разберёмся! Какая формула связывает катеты и гипотенузу в прямоугольном треугольнике?",
+            ),
+            DemoDialog("student", "Кажется, c2 = a2 + b2?"),
+            DemoDialog("tutor", "Верно, это теорема Пифагора. Подставь свои значения и посчитай."),
+            DemoDialog("student", "9 + 16 = 25, значит c = 5 см"),
+            DemoDialog(
+                "tutor", "Отлично, задача решена! Гипотенуза равна 5 см, ты справился самостоятельно."
+            ),
+        ),
     ),
     DemoTask(
         9_100_101,
         TaskSubject.math,
         "Проценты",
-        TaskStatus.active,
-        2,
-        0,
-        "Куртка стоит 4000 рублей, скидка 15 процентов, сколько заплатим",
-        "Сколько процентов от первоначальной цены останется заплатить?",
+        TaskStatus.solved,
+        3,
+        1,
+        (
+            DemoDialog("student", "Куртка стоит 4000 рублей, скидка 15 процентов. Сколько заплатим?"),
+            DemoDialog("tutor", "Сколько процентов от первоначальной цены останется заплатить после скидки?"),
+            DemoDialog("student", "85 процентов. 4000 умножить на 0.85 = 3400 рублей"),
+            DemoDialog("tutor", "Правильно! Проверь только перевод процентов в дробь — всё ли верно."),
+            DemoDialog("student", "Да, 15% = 0.15, 1 - 0.15 = 0.85. Ответ 3400"),
+            DemoDialog("tutor", "Задача решена: 3400 рублей. Хорошая работа с процентами."),
+        ),
+    ),
+    DemoTask(
+        9_100_101,
+        TaskSubject.math,
+        "Обыкновенные дроби",
+        TaskStatus.solved,
+        3,
+        6,
+        (
+            DemoDialog("student", "Как сложить 2/3 и 1/4?"),
+            DemoDialog("tutor", "Что нужно, чтобы у дробей стал одинаковым знаменатель?"),
+            DemoDialog("student", "Привести к общему знаменателю 12. Получится 8/12 + 3/12 = 11/12"),
+            DemoDialog("tutor", "Именно так, задача решена: 11/12."),
+        ),
     ),
     DemoTask(
         9_100_102,
         TaskSubject.math,
-        "Теорема Пифагора",
+        "Квадратные уравнения",
         TaskStatus.solved,
         5,
         2,
-        "Диагональ прямоугольника 13, одна сторона 5, найдите вторую сторону",
-        "Какая формула связывает диагональ прямоугольника с его сторонами?",
+        (
+            DemoDialog("student", "Решите уравнение x2 - 5x + 6 = 0"),
+            DemoDialog("tutor", "Что такое дискриминант и по какой формуле он считается?"),
+            DemoDialog("student", "D = b2 - 4ac = 25 - 24 = 1"),
+            DemoDialog("tutor", "Отлично. Что делаем с дискриминантом дальше?"),
+            DemoDialog("student", "Корни: x = (5 +- 1) / 2, то есть 2 и 3"),
+            DemoDialog(
+                "tutor", "Верно, задача решена: x = 2 и x = 3. Ты провёл полное исследование уравнения."
+            ),
+        ),
+    ),
+    DemoTask(
+        9_100_102,
+        TaskSubject.math,
+        "Проценты",
+        TaskStatus.active,
+        2,
+        0,
+        (
+            DemoDialog("student", "Товар стоил 2500 рублей, подорожал на 12 процентов. Новая цена?"),
+            DemoDialog("tutor", "На сколько рублей товар подорожает? Найди сначала один процент от 2500."),
+        ),
+    ),
+    DemoTask(
+        9_100_102,
+        TaskSubject.math,
+        "Степени",
+        TaskStatus.solved,
+        3,
+        5,
+        (
+            DemoDialog("student", "Упростите выражение a5 умножить на a3"),
+            DemoDialog("tutor", "Вспомни правило умножения степеней с одинаковым основанием."),
+            DemoDialog("student", "Показатели складываются: a в восьмой степени"),
+            DemoDialog("tutor", "Задача решена: a8. Верно."),
+        ),
     ),
     DemoTask(
         9_100_103,
-        TaskSubject.physics,
-        "Равномерное движение",
+        TaskSubject.math,
+        "Формулы сокращённого умножения",
         TaskStatus.abandoned,
         1,
+        2,
+        (
+            DemoDialog("student", "Как раскрыть скобки в (x + 3)2?"),
+            DemoDialog("tutor", "Это квадрат суммы. Попробуй вспомнить формулу: a2 + 2ab + ...?"),
+        ),
+    ),
+    DemoTask(
+        9_100_103,
+        TaskSubject.math,
+        "Квадратные уравнения",
+        TaskStatus.active,
+        2,
         1,
-        "Поезд едет 72 километра в час, какой путь он пройдёт за 30 минут",
-        "Как связаны скорость, время и расстояние?",
+        (
+            DemoDialog("student", "Решите уравнение x2 - 4x = 0"),
+            DemoDialog("tutor", "Можно ли вынести общий множитель за скобки? Что останется внутри?"),
+        ),
+    ),
+    DemoTask(
+        9_100_103,
+        TaskSubject.math,
+        "Проценты",
+        TaskStatus.active,
+        2,
+        3,
+        (
+            DemoDialog(
+                "student",
+                "Спортсмен пробежал дистанцию за 25 минут, это на 20 процентов быстрее "
+                "прошлого раза. Какой был прошлый результат?",
+            ),
+            DemoDialog(
+                "tutor",
+                "Если новый результат быстрее, то прошлое время было больше. "
+                "На сколько процентов оно больше нового?",
+            ),
+        ),
+    ),
+    DemoTask(
+        9_100_103,
+        TaskSubject.math,
+        "Обыкновенные дроби",
+        TaskStatus.abandoned,
+        1,
+        5,
+        (
+            DemoDialog("student", "Как разделить 3/5 на 2/7?"),
+            DemoDialog("tutor", "Что происходит с дробью, на которую делим, при замене деления умножением?"),
+        ),
+    ),
+    DemoTask(
+        9_100_104,
+        TaskSubject.math,
+        "Теорема Пифагора",
+        TaskStatus.solved,
+        4,
+        4,
+        (
+            DemoDialog(
+                "student",
+                "Лестница длиной 10 м прислонена к стене, нижний конец на 6 м от стены. "
+                "На какой высоте верхний конец?",
+            ),
+            DemoDialog("tutor", "Какую роль здесь играет стена, земля и лестница? Какая получилась фигура?"),
+            DemoDialog("student", "Прямоугольный треугольник, лестница это гипотенуза"),
+            DemoDialog("tutor", "Верно. Теперь примени теорему Пифагора и найди неизвестный катет."),
+            DemoDialog("student", "100 - 36 = 64, значит высота 8 м"),
+            DemoDialog("tutor", "Задача решена: 8 метров. Отлично справился с практической задачей."),
+        ),
+    ),
+    DemoTask(
+        9_100_104,
+        TaskSubject.math,
+        "Задачи на движение",
+        TaskStatus.active,
+        1,
+        0,
+        (
+            DemoDialog("student", "Велосипедист едет 12 км/ч. За какое время он проедет 30 км?"),
+            DemoDialog("tutor", "Как связаны скорость, время и расстояние одной формулой?"),
+        ),
     ),
     DemoTask(
         9_100_201,
@@ -328,18 +478,123 @@ DEMO_TASKS = (
         TaskStatus.solved,
         3,
         1,
-        "Масса кирпича 3.6 кг, объём 2 дм3, найдите плотность",
-        "По какой формуле плотность связана с массой и объёмом?",
+        (
+            DemoDialog("student", "Масса кирпича 3.6 кг, объём 2 дм3. Найдите плотность"),
+            DemoDialog("tutor", "По какой формуле плотность связана с массой и объёмом?"),
+            DemoDialog("student", "ро = m / V = 3.6 / 2 = 1.8 кг/дм3, это 1800 кг/м3"),
+            DemoDialog(
+                "tutor", "Задача решена: 1800 кг/м3. Не забудь про перевод единиц — ты сделал его верно."
+            ),
+        ),
     ),
     DemoTask(
-        9_100_202,
-        TaskSubject.math,
-        "Квадратные уравнения",
+        9_100_201,
+        TaskSubject.physics,
+        "Давление",
+        TaskStatus.solved,
+        3,
+        4,
+        (
+            DemoDialog("student", "Ящик массой 50 кг стоит на полу, площадь опоры 0.25 м2. Давление?"),
+            DemoDialog(
+                "tutor", "Какая формула связывает давление, силу и площадь? Что здесь играет роль силы?"
+            ),
+            DemoDialog("student", "Сила тяжести: F = mg = 500 Н. p = F / S = 500 / 0.25 = 2000 Па"),
+            DemoDialog("tutor", "Задача решена: 2 кПа. Ты верно выразил силу через массу."),
+        ),
+    ),
+    DemoTask(
+        9_100_201,
+        TaskSubject.physics,
+        "Архимедова сила",
         TaskStatus.active,
         2,
         0,
-        "Решите уравнение x2 минус 5x плюс 6 равно 0",
-        "Что такое дискриминант квадратного уравнения?",
+        (
+            DemoDialog(
+                "student", "Тело объёмом 0.002 м3 полностью погружено в воду. Чему равна сила Архимеда?"
+            ),
+            DemoDialog("tutor", "Запиши формулу силы Архимеда. Какая плотность у воды и чему равно g?"),
+        ),
+    ),
+    DemoTask(
+        9_100_202,
+        TaskSubject.physics,
+        "Равномерное движение",
+        TaskStatus.abandoned,
+        1,
+        1,
+        (
+            DemoDialog("student", "Поезд едет 72 км/ч. Какой путь он пройдёт за 30 минут?"),
+            DemoDialog("tutor", "Переведи время в часы или скорость в метры в секунду. Что удобнее?"),
+        ),
+    ),
+    DemoTask(
+        9_100_202,
+        TaskSubject.physics,
+        "Плотность",
+        TaskStatus.active,
+        2,
+        2,
+        (
+            DemoDialog("student", "Определите вещество, если деталь массой 810 г имеет объём 300 см3"),
+            DemoDialog(
+                "tutor", "Найди плотность в г/см3 и сравни с таблицей плотностей. Какое вещество подходит?"
+            ),
+        ),
+    ),
+    DemoTask(
+        9_100_202,
+        TaskSubject.physics,
+        "Механическая работа",
+        TaskStatus.solved,
+        4,
+        6,
+        (
+            DemoDialog("student", "Подъёмник поднял груз 200 кг на высоту 5 м. Работа силы?"),
+            DemoDialog(
+                "tutor",
+                "По какой формуле считается механическая работа? "
+                "Чему равна сила подъёмника при равномерном подъёме?",
+            ),
+            DemoDialog("student", "F = mg = 2000 Н, A = F умножить h = 2000 умножить 5 = 10000 Дж"),
+            DemoDialog("tutor", "Задача решена: 10 кДж. Верно выбрал формулу."),
+        ),
+    ),
+    DemoTask(
+        9_100_203,
+        TaskSubject.physics,
+        "Давление",
+        TaskStatus.solved,
+        3,
+        2,
+        (
+            DemoDialog(
+                "student", "Почему у трактора широкие гусеницы, если давление равно сила делить площадь?"
+            ),
+            DemoDialog("tutor", "Что происходит с давлением при увеличении площади опоры при той же силе?"),
+            DemoDialog("student", "Давление уменьшается, поэтому трактор меньше проваливается в грунт"),
+            DemoDialog("tutor", "Задача решена — верный физический вывод. Так и работают гусеницы и лыжи."),
+        ),
+    ),
+    DemoTask(
+        9_100_203,
+        TaskSubject.physics,
+        "Тепловые явления",
+        TaskStatus.solved,
+        4,
+        5,
+        (
+            DemoDialog(
+                "student", "Какое количество теплоты нужно, чтобы нагреть 2 кг воды от 20 до 70 градусов?"
+            ),
+            DemoDialog("tutor", "Запиши формулу Q = cm дельта t. Чему равна удельная теплоёмкость воды?"),
+            DemoDialog(
+                "student",
+                "c = 4200 Дж/(кг·градус), дельта t = 50. Q = 4200 умножить 2 умножить 50 = 420000 Дж",
+            ),
+            DemoDialog("tutor", "Задача решена: 420 кДж. Отличная работа с формулой и единицами."),
+        ),
     ),
 )
 
@@ -394,6 +649,7 @@ async def cmd_seed(args: argparse.Namespace) -> int:
                 locale="ru",
                 role=UserRole.teacher,
                 is_active=True,
+                role_confirmed_at=now,
             )
             session.add(teacher)
             await session.flush()
@@ -420,6 +676,7 @@ async def cmd_seed(args: argparse.Namespace) -> int:
                     role=UserRole.student,
                     grade=item.grade,
                     is_active=True,
+                    role_confirmed_at=now,
                 )
                 session.add(student)
                 await session.flush()
@@ -436,6 +693,7 @@ async def cmd_seed(args: argparse.Namespace) -> int:
                 locale="ru",
                 role=UserRole.parent,
                 is_active=True,
+                role_confirmed_at=now,
             )
             session.add(parent)
             await session.flush()
@@ -452,8 +710,8 @@ async def cmd_seed(args: argparse.Namespace) -> int:
 
         for demo in DEMO_TASKS:
             student = student_users[demo.student_max_id]
-            started_at = now - timedelta(days=demo.age_days, hours=3)
-            last_activity = started_at + timedelta(minutes=15 * demo.steps)
+            started_at = now - timedelta(days=demo.age_days, hours=2)
+            last_activity = started_at + timedelta(minutes=12 * demo.steps)
             solved_at = last_activity if demo.status == TaskStatus.solved else None
             task = Task(
                 id=uuid4(),
@@ -473,24 +731,16 @@ async def cmd_seed(args: argparse.Namespace) -> int:
             )
             session.add(task)
             await session.flush()
-            session.add(
-                TaskMessage(
-                    id=uuid4(),
-                    task_id=task.id,
-                    author="student",
-                    content=demo.problem,
-                    created_at=started_at,
+            for offset, dialog in enumerate(demo.messages):
+                session.add(
+                    TaskMessage(
+                        id=uuid4(),
+                        task_id=task.id,
+                        author=dialog.author,
+                        content=dialog.content,
+                        created_at=started_at + timedelta(minutes=6 * offset),
+                    )
                 )
-            )
-            session.add(
-                TaskMessage(
-                    id=uuid4(),
-                    task_id=task.id,
-                    author="tutor",
-                    content=demo.first_question,
-                    created_at=started_at + timedelta(minutes=1),
-                )
-            )
 
         await session.commit()
         print(

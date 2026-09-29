@@ -11,14 +11,11 @@ import type { PersonalDataReport } from '../types';
 const ACTION_LABELS: Record<string, string> = {
   'consent.granted': 'Предоставлено согласие',
   'consent.revoked': 'Отозвано согласие',
-  'appeal.created': 'Создано обращение',
-  'appeal.message_added': 'Добавлено сообщение',
-  'appeal.status_changed': 'Изменён статус обращения',
-  'appeal.rated': 'Поставлена оценка',
+  'user.role_selected': 'Выбрана роль',
   'auth.miniapp': 'Вход в кабинет',
   'auth.logout': 'Выход из кабинета',
   'user.phone_updated': 'Сохранён номер телефона',
-  'guardian.link_requested': 'Заявка на привязку ребёнка',
+  'guardian.link_requested': 'Код привязки ребёнка',
   'guardian.link_verified': 'Связь с ребёнком подтверждена',
   'personal_data.erasure_requested': 'Заявление о прекращении обработки',
 };
@@ -150,7 +147,7 @@ function purposeLabel(purpose: string): string {
     case 'notifications':
       return 'Уведомления';
     case 'ai_processing':
-      return 'Черновики ответов';
+      return 'ИИ-наставник';
     default:
       return purpose;
   }

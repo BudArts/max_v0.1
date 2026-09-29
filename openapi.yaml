@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: УчусьИИ
-  description: 'API ИИ-наставника «УчусьИИ»: вход через MAX, задачи учеников, диалоги
+  title: Учусь.ai
+  description: 'API ИИ-наставника «Учусь.ai»: вход через MAX, задачи учеников, диалоги
     с наставником, аналитика педагога, дайджесты родителя, согласия и персональные
     данные (152-ФЗ). Маршруты /dev/* существуют только в режиме локальной проверки
     (DEV_LOGIN_ENABLED).'
@@ -148,6 +148,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PhoneShareRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserView'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /api/v1/me/role:
+    patch:
+      tags:
+      - Кабинет
+      summary: Выбрать роль в сервисе
+      operationId: choose_role_api_v1_me_role_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
         required: true
       responses:
         '200':
@@ -966,6 +993,19 @@ components:
       required:
       - refresh_token
       title: RefreshRequest
+    RoleUpdate:
+      properties:
+        role:
+          type: string
+          enum:
+          - student
+          - parent
+          - teacher
+          title: Role
+      type: object
+      required:
+      - role
+      title: RoleUpdate
     TokenPair:
       properties:
         access_token:
@@ -1020,6 +1060,10 @@ components:
           - type: integer
           - type: 'null'
           title: Grade
+        role_confirmed:
+          type: boolean
+          title: Role Confirmed
+          default: false
         is_active:
           type: boolean
           title: Is Active
