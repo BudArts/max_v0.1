@@ -82,8 +82,7 @@ class TutorService:
 
         redacted = redactor.redact(_truncate(student_text))
         messages = [
-            ChatMessage(role="system", content=SYSTEM_TUTOR),
-            ChatMessage(role="system", content=SYSTEM_GRADE_HINT),
+            ChatMessage(role="system", content=f"{SYSTEM_TUTOR}\n\n{SYSTEM_GRADE_HINT}"),
         ]
         if history:
             for item in history[-HISTORY_WINDOW:]:
