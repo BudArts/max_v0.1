@@ -47,6 +47,14 @@ class ConsentService:
             ):
                 touched.append(existing)
                 continue
+            if existing is not None and existing.version == document.version:
+                existing.title = document.title
+                existing.body = document.body
+                existing.checksum = document.checksum
+                existing.published_at = datetime.now(UTC)
+                touched.append(existing)
+                log.info("policy_updated", code=code, version=document.version)
+                continue
             if existing is not None:
                 await self._session.execute(
                     update(PolicyDocument).where(PolicyDocument.code == code).values(is_current=False)
