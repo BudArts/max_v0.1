@@ -1,36 +1,36 @@
 [project]
 name = "uchusai-backend"
 version = "0.1.0"
-description = "Сервис обращений родителей и учителей в мессенджере MAX"
+description = "ИИ-наставник школьника в мессенджере MAX"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
-    "pydantic>=2.9",
-    "pydantic-settings>=2.6",
-    "sqlalchemy[asyncio]>=2.0.36",
-    "asyncpg>=0.30",
-    "alembic>=1.14",
-    "httpx>=0.28",
-    "PyJWT>=2.10",
-    "cryptography>=44.0",
-    "argon2-cffi>=23.1",
-    "python-multipart>=0.0.18",
-    "structlog>=24.4",
-    "email-validator>=2.2",
-    "Pillow>=11.0",
-    "pytesseract>=0.3.13",
+    "fastapi==0.142.1",
+    "uvicorn[standard]==0.54.0",
+    "pydantic==2.13.5",
+    "pydantic-settings==2.15.0",
+    "sqlalchemy[asyncio]==2.1.1",
+    "asyncpg==0.31.0",
+    "alembic==1.20.0",
+    "httpx==0.28.1",
+    "PyJWT==2.15.1",
+    "cryptography==50.0.1",
+    "argon2-cffi==25.1.0",
+    "python-multipart==0.0.32",
+    "structlog==26.1.0",
+    "email-validator==2.3.0",
+    "Pillow==12.3.0",
+    "pytesseract==0.3.13",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3",
-    "pytest-asyncio>=0.24",
-    "pytest-cov>=6.0",
-    "aiosqlite>=0.20",
-    "respx>=0.22",
-    "ruff>=0.8",
-    "mypy>=1.13",
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==7.1.0",
+    "aiosqlite==0.22.1",
+    "respx==0.23.1",
+    "ruff==0.16.9",
+    "mypy==2.3.1",
     "types-PyJWT",
 ]
 
