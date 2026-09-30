@@ -128,6 +128,33 @@ export function EmptyState({
   );
 }
 
+export function Bar({
+  label,
+  value,
+  max,
+  hint,
+  tone = 'accent',
+}: {
+  label: string;
+  value: number;
+  max: number;
+  hint?: string | undefined;
+  tone?: 'accent' | 'success' | undefined;
+}): JSX.Element {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  return (
+    <div className="bar">
+      <div className="row row--between">
+        <span className="small">{label}</span>
+        <span className="small muted">{hint ?? value}</span>
+      </div>
+      <div className="bar__track">
+        <div className={`bar__fill${tone === 'success' ? ' bar__fill--success' : ''}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export function Stat({ value, label }: { value: ReactNode; label: string }): JSX.Element {
   return (
     <div className="stat">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
+import { Bar, Card, EmptyState, ScreenLoader } from '../components/ui';
 import { api } from '../lib/api';
 import type { RiskStudent } from '../types';
 
@@ -40,7 +40,12 @@ export function TeacherRiskPage(): JSX.Element {
       {students.map((student) => (
         <Card key={student.user_id} title={student.name} hint={`${student.grade} класс`}>
           <div className="stack">
-            <Stat value={student.unsolved} label="Нерешённых задач за неделю" />
+            <Bar
+              label="Нерешённых задач за неделю"
+              value={student.unsolved}
+              max={5}
+              hint={String(student.unsolved)}
+            />
             {student.stuck_topics.length > 0 && (
               <p className="muted">Темы: {student.stuck_topics.join(', ')}</p>
             )}

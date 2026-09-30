@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Alert, Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
+import { Alert, Bar, Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
 import { api } from '../lib/api';
 import { useSession } from '../state/session';
 import type { ChildView, DigestView, GradeOverview, TaskStatistics } from '../types';
@@ -178,19 +178,26 @@ function TeacherHome(): JSX.Element {
             <div className="stack">
               <div className="stat-grid">
                 <Stat value={item.tasks_total} label="Задач" />
-                <Stat value={item.tasks_solved} label="Решено" />
-                <Stat value={`${share}%`} label="Доля решённых" />
+                <Stat value={`${share}%`} label="Решено" />
               </div>
+              <Bar
+                label="Решено от поставленных"
+                value={item.tasks_solved}
+                max={Math.max(item.tasks_total, 1)}
+                hint={`${item.tasks_solved} из ${item.tasks_total}`}
+                tone="success"
+              />
               {item.topics.length > 0 && (
                 <div className="stack">
                   <p className="muted">Темы класса:</p>
                   {item.topics.map((topic) => (
-                    <div key={topic.topic} className="row row--between">
-                      <span>{topic.topic}</span>
-                      <span className="muted">
-                        решено {topic.solved} из {topic.total}
-                      </span>
-                    </div>
+                    <Bar
+                      key={topic.topic}
+                      label={topic.topic}
+                      value={topic.solved}
+                      max={Math.max(topic.total, 1)}
+                      hint={`${topic.solved}/${topic.total}`}
+                    />
                   ))}
                 </div>
               )}

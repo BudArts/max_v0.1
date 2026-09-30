@@ -93,8 +93,6 @@ async def choose_role(
     if user.role == UserRole.administrator:
         raise ForbiddenError("Роль администратора назначается оператором системы")
     selected = UserRole(payload.role)
-    if user.role != UserRole.student or user.role_confirmed_at is not None:
-        raise ConflictError("Роль уже выбрана, изменить её можно через поддержку школы")
     user.role = selected
     user.role_confirmed_at = datetime.now(UTC)
     await AuditService(session, settings).record(

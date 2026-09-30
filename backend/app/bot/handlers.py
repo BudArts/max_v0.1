@@ -67,7 +67,9 @@ HELP_TEXT = (
     "5. Учитель видит темы класса, родитель — недельный дайджест ребёнка.\n\n"
     "Команды:\n"
     "/stats — моя статистика\n"
-    "/code — код для привязки родителя (ученикам)\n"
+    "/code — код привязки для родителя (ученикам)\n"
+    "/role — сменить роль: ученик, родитель или педагог\n"
+    "/role — сменить роль (ученик, родитель, педагог)\n"
     "/consent — согласия и данные\n"
     "/stop — прекратить обработку данных\n\n"
     "Наставник не заменяет учителя и не помогает на контрольных и экзаменах."
@@ -105,6 +107,17 @@ PARENT_CODE_TEXT = (
 
 PARENT_ROLE_HINT = "Код привязки выдаёт ученик со своего аккаунта: команда /code."
 
+ROLE_PROMPT = (
+    "Выберите роль — от неё зависит сценарий:\n"
+    "Ученик решает задачи здесь, в чате с наставником.\n"
+    "Родитель и педагог работают в личном кабинете с аналитикой."
+)
+ROLE_DONE_LK = (
+    "Роль сохранена. Откройте личный кабинет из меню бота: там дети, дайджесты и аналитика.\n"
+    "Сменить роль можно командой /role."
+)
+ROLE_DONE_CONSENT = "Роль сохранена. Осталось подтвердить согласие — и личный кабинет откроется."
+
 STATS_TEMPLATE = "Ваша статистика:\nЗадач всего: {total}\nРешено: {solved}\nВ работе: {active}\n\n{topics}"
 
 ERASURE_ACCEPTED = (
@@ -127,6 +140,7 @@ BOT_COMMANDS = [
     {"name": "code", "description": "Код для привязки родителя"},
     {"name": "consent", "description": "Согласия и персональные данные"},
     {"name": "help", "description": "Как работает наставник"},
+    {"name": "role", "description": "Сменить роль (ученик, родитель, педагог)"},
     {"name": "stop", "description": "Прекратить обработку данных"},
 ]
 
@@ -184,6 +198,10 @@ async def _welcome(
     consents: ConsentService,
     profile: BotProfile,
 ) -> None:
+    if user.role_confirmed_at is None:
+        await _ask_role(runtime, event)
+        return
+
     if not await consents.is_granted(user.id, ConsentPurpose.service):
         await _send(
             runtime,
@@ -233,9 +251,20 @@ def _student_menu(profile: BotProfile) -> list[list[dict[str, Any]]]:
     rows: list[list[dict[str, Any]]] = []
     if profile.ready and profile.username:
         rows.append([open_app_button("Личный кабинет", profile.username, profile.user_id or 0, "cabinet")])
-    rows.append([callback_button("Согласия и данные", "consent:show")])
-    rows.append([callback_button("Как это работает", "help")])
+    rows.append([callback_button("Моя статистика", "stats"), callback_button("Как это работает", "help")])
     return rows
+
+
+def _role_keyboard() -> list[list[dict[str, Any]]]:
+    return [
+        [callback_button("Ученик", "role:select:student")],
+        [callback_button("Родитель", "role:select:parent")],
+        [callback_button("Педагог", "role:select:teacher")],
+    ]
+
+
+async def _ask_role(runtime: Runtime, event: IncomingEvent) -> None:
+    await _send(runtime, event, f"{GREETING}\n\n{ROLE_PROMPT}", keyboard=_role_keyboard())
 
 
 async def _ask_grade(runtime: Runtime, event: IncomingEvent) -> None:
@@ -261,6 +290,32 @@ async def _on_callback(
     notification: str | None = None
 
     parts = payload.split(":")
+    if parts[0] == "role" and len(parts) == 3 and parts[1] == "select":
+        if parts[2] not in {"student", "parent", "teacher"}:
+            notification = "Неизвестная роль"
+        else:
+            user.role = UserRole(parts[2])
+            user.role_confirmed_at = datetime.now(UTC)
+            await audit.record(
+                "user.role_selected",
+                actor_user_id=user.id,
+                entity_type="user",
+                entity_id=str(user.id),
+                outcome=user.role.value,
+            )
+            if user.role == UserRole.student:
+                await _ask_grade(runtime, event)
+                return
+            if await consents.is_granted(user.id, ConsentPurpose.service):
+                await _send(runtime, event, ROLE_DONE_LK, keyboard=_student_menu(profile))
+            else:
+                await _send(
+                    runtime,
+                    event,
+                    ROLE_DONE_CONSENT,
+                    keyboard=[[callback_button("Принять согласие", "consent:service:accept")]],
+                )
+        return
     if parts[0] == "consent" and len(parts) == 3:
         purpose = _purpose(parts[1])
         if purpose is None:
@@ -413,6 +468,19 @@ async def _on_message(
         await _on_command(runtime, session, event, user, users, consents, audit, profile, event.command or "")
         return
 
+    if user.role_confirmed_at is None:
+        await _ask_role(runtime, event)
+        return
+
+    if user.role != UserRole.student:
+        await _send(
+            runtime,
+            event,
+            "Задачи решают ученики в чате с наставником. Ваш кабинет открыт из меню бота.",
+            keyboard=_student_menu(profile),
+        )
+        return
+
     if not text and not event.attachments:
         await _send(runtime, event, NO_TEXT, keyboard=_student_menu(profile))
         return
@@ -498,6 +566,8 @@ async def _on_command(
     if command in {"start", "начать"}:
         user.bot_stopped_at = None
         await _welcome(runtime, session, event, user, consents, profile)
+    elif command in {"role", "роль"}:
+        await _ask_role(runtime, event)
     elif command in {"help", "помощь"}:
         await _send(runtime, event, HELP_TEXT, keyboard=_student_menu(profile))
     elif command in {"stats", "статистика"}:

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { Alert, Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
+import { Alert, Bar, Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
 import { api, ApiError } from '../lib/api';
 import type { ChildView, DigestView } from '../types';
 
@@ -141,15 +141,16 @@ export function ChildDigestPage(): JSX.Element {
         </div>
       </Card>
 
-      <Card title="По дням">
+      <Card title="По дням" hint="Полоска — сколько задач начато">
         <div className="stack">
           {digest.daily.map((day) => (
-            <div key={day.day} className="row row--between">
-              <span>{day.day}</span>
-              <span className="muted">
-                начато {day.started} · решено {day.solved}
-              </span>
-            </div>
+            <Bar
+              key={day.day}
+              label={day.day}
+              value={day.started}
+              max={Math.max(...digest.daily.map((item) => item.started), 1)}
+              hint={`решено ${day.solved}`}
+            />
           ))}
         </div>
       </Card>

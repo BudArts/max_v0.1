@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -38,6 +39,21 @@ class TutorTurn:
 
 def _truncate(text: str) -> str:
     return text[:MAX_INPUT_CHARS]
+
+
+_REPLY_RE = re.compile(r"reply\s*[:\-]\s*(.+)", re.IGNORECASE | re.DOTALL)
+_META_RE = re.compile(r"(phase|subject|topic|steps_done|solution)\s*[:\-].*", re.IGNORECASE)
+
+
+def _reply_from_text(text: str) -> str:
+    candidate = text
+    match = _REPLY_RE.search(text)
+    if match:
+        candidate = match.group(1)
+    lines = [line.lstrip("> ").strip() for line in candidate.splitlines()]
+    lines = [line for line in lines if line and not _META_RE.fullmatch(line)]
+    cleaned = " ".join(" ".join(lines).split())
+    return cleaned or text.strip()[:MAX_REPLY_CHARS]
 
 
 def _parse_json_object(text: str) -> dict[str, Any]:
@@ -126,7 +142,7 @@ class TutorService:
             parsed = _parse_json_object(completion.text)
         except ValueError:
             return TutorTurn(
-                reply=completion.text[:MAX_REPLY_CHARS],
+                reply=_reply_from_text(completion.text)[:MAX_REPLY_CHARS],
                 phase="guide",
                 subject=task.subject,
                 model=completion.model,
