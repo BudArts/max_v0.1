@@ -1,7 +1,7 @@
 name: uchusai
 
 x-backend-env: &backend-env
-  APP_NAME: ${APP_NAME:-УчусьИИ}
+  APP_NAME: ${APP_NAME:-Учусь.ai}
   APP_ENV: ${APP_ENV:-development}
   APP_DEBUG: ${APP_DEBUG:-false}
   APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
@@ -31,6 +31,7 @@ x-backend-env: &backend-env
   GIGACHAT_AUTH_URL: ${GIGACHAT_AUTH_URL:-https://ngw.devices.sberbank.ru:9443/api/v2/oauth}
   GIGACHAT_BASE_URL: ${GIGACHAT_BASE_URL:-https://gigachat.devices.sberbank.ru/api/v1}
   GIGACHAT_VERIFY_SSL: ${GIGACHAT_VERIFY_SSL:-true}
+  GIGACHAT_TIMEOUT: ${GIGACHAT_TIMEOUT:-45}
   GIGACHAT_CA_BUNDLE: ${GIGACHAT_CA_BUNDLE:-/etc/ssl/uchusai/russian_trusted_ca.pem}
   GIGACHAT_ENABLED: ${GIGACHAT_ENABLED:-false}
   RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-60}
