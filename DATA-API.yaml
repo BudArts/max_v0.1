@@ -1,0 +1,91 @@
+# Дескриптор собственного API решения (требование техregulations/FAQ, вопрос 12).
+# Сама спецификация интерфейса — файл openapi.yaml (OpenAPI 3.1) рядом с этим файлом;
+# она же доступна на работающем сервере по адресу /openapi.json.
+
+name: uchusai-api
+title: Учусь.ai — API ИИ-наставника школьника (мессенджер MAX)
+version: 0.1.0
+format: OpenAPI 3.1
+specification: ./openapi.yaml
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Локальный запуск (docker compose up -d, профиль HTTP)
+  - url: https://<домен-команды>/api/v1
+    description: Адрес развёрнутого решения — заполняется после публикации сервера
+
+authentication:
+  scheme: Bearer JWT
+  description: >
+    Пара токенов выдаётся после входа по подписанным стартовым данным MAX
+    (POST /api/v1/auth/max, поле init_data). Access-токен живёт 30 минут,
+    обновление — POST /api/v1/auth/refresh.
+
+test_access:
+  description: >
+    Демо-режим включается переменной DEV_LOGIN_ENABLED=true при APP_ENV=development
+    (значения по умолчанию в docker-compose). На главной странице мини-приложения
+    появляется выбор кабинета; те же шаги доступны через API.
+  users:
+    - {max_user_id: 9100101, role: ученик, name: Артём Ковалёв}
+    - {max_user_id: 9100001, role: родитель, name: Мария Ковалёва (мама Артёма Ковалёва)}
+    - {max_user_id: 9100002, role: родитель, name: Игорь Носов}
+    - {max_user_id: 9000000, role: педагог, name: Ольга Лебедева (классный руководитель 7А)}
+    - {max_user_id: 9000001, role: педагог, name: Сергей Панкратов (классный руководитель 8А)}
+  steps:
+    - GET /api/v1/dev/users — список демо-пользователей
+    - GET /api/v1/dev/init-data?max_user_id=9100001 — подписанные стартовые данные
+    - POST /api/v1/auth/max с полем init_data — пара токенов
+    - заголовок Authorization: Bearer <access_token> в остальных запросах
+
+webhooks:
+  - url: https://<домен-команды>/webhook/max
+    description: Приёмник событий MAX Bot API; подпись проверяется по заголовку X-Max-Bot-Api-Secret
+
+checks:
+  base: /api/v1
+  description: Обязательные проверки основной функциональности; авторизация Bearer access_token
+  list:
+    - {name: Демо-пользователи, method: GET, path: /dev/users, role: гость, status: [200],
+       response: "массив {max_user_id, role, first_name, last_name}"}
+    - {name: Вход по initData, method: POST, path: /auth/max, role: гость,
+       params: {body: {init_data: string}}, status: [200],
+       response: "{access_token, refresh_token, token_type, user}"}
+    - {name: Обновление пары токенов, method: POST, path: /auth/refresh, role: гость,
+       params: {body: {refresh_token: string}}, status: [200], response: "новая пара токенов"}
+    - {name: Профиль, method: GET, path: /me, role: любой авторизованный, status: [200],
+       response: "{user: {id, role, first_name, grade, consents...}}"}
+    - {name: Смена роли, method: PATCH, path: /me/role, role: любой авторизованный,
+       params: {body: {role: student|parent|teacher}}, status: [200], response: "{user}"}
+    - {name: Правовые документы, method: GET, path: /legal, role: гость, status: [200],
+       response: "{documents: [{code, version, title}]}"}
+    - {name: Принятие согласия, method: POST, path: "/consents/{purpose}", role: любой авторизованный,
+       params: {body: {document_version: string}}, status: [200], response: "{consents}"}
+    - {name: Список задач, method: GET, path: /tasks, role: ученик, status: [200],
+       response: "{tasks: [{id, status, subject, topic, created_at}]}"}
+    - {name: Статистика ученика, method: GET, path: /tasks/statistics, role: ученик, status: [200],
+       response: "{total, solved, active, recent_topics}"}
+    - {name: Задача с диалогом, method: GET, path: "/tasks/{task_id}", role: ученик,
+       status: [200, 403, 404], response: "{task, messages}"}
+    - {name: Обзор классов, method: GET, path: /tutor/overview, role: педагог,
+       params: {query: {grades: "number[]"}}, status: [200],
+       response: "{grades: [{grade, students, tasks_total, tasks_solved, topics}]}"}
+    - {name: Группа риска, method: GET, path: /tutor/risk, role: педагог,
+       params: {query: {grades: "number[]"}}, status: [200],
+       response: "{students: [{user_id, name, grade, unsolved, stuck_topics}]}"}
+    - {name: Код привязки родителя, method: POST, path: /tutor/link-code, role: ученик,
+       status: [201, 403], response: "{code}"}
+    - {name: Дети родителя, method: GET, path: /parent/children, role: родитель, status: [200],
+       response: "{children: [{student_id, name, grade, last_activity}]}"}
+    - {name: Привязка по коду, method: POST, path: /parent/link, role: родитель,
+       params: {body: {code: string}}, status: [200, 403, 404], response: "{child}"}
+    - {name: Недельный дайджест, method: GET, path: "/parent/children/{student_id}/digest",
+       role: родитель, status: [200, 403, 404],
+       response: "{started, solved, topics, daily, mentor}"}
+    - {name: Уведомления, method: GET, path: /notifications, role: любой авторизованный,
+       status: [200], response: "{items, unread}"}
+
+related_documents:
+  - docs/api.md — описание маршрутов, ошибок, вебхука и алгоритмов проверки подписей
+  - docs/architecture.md — архитектура сервиса
+  - docs/security.md — модель угроз и соответствие 152-ФЗ
