@@ -155,6 +155,38 @@ export function Bar({
   );
 }
 
+export function GradeFilter({
+  grades,
+  value,
+  onChange,
+}: {
+  grades: number[];
+  value: number | null;
+  onChange: (grade: number | null) => void;
+}): JSX.Element {
+  return (
+    <div className="chips">
+      <button
+        type="button"
+        className={`chip${value === null ? ' chip--active' : ''}`}
+        onClick={() => onChange(null)}
+      >
+        Все классы
+      </button>
+      {grades.map((grade) => (
+        <button
+          key={grade}
+          type="button"
+          className={`chip${value === grade ? ' chip--active' : ''}`}
+          onClick={() => onChange(grade)}
+        >
+          {grade} класс
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function Stat({ value, label }: { value: ReactNode; label: string }): JSX.Element {
   return (
     <div className="stat">

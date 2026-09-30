@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Alert, Bar, Card, EmptyState, ScreenLoader, Stat } from '../components/ui';
+import { Alert, Bar, Card, EmptyState, GradeFilter, ScreenLoader, Stat } from '../components/ui';
 import { api } from '../lib/api';
 import { useSession } from '../state/session';
 import type { ChildView, DigestView, GradeOverview, TaskStatistics } from '../types';
@@ -147,6 +147,7 @@ function ParentHome(): JSX.Element {
 
 function TeacherHome(): JSX.Element {
   const [overview, setOverview] = useState<GradeOverview[] | null>(null);
+  const [grade, setGrade] = useState<number | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -171,7 +172,14 @@ function TeacherHome(): JSX.Element {
 
   return (
     <div className="stack">
-      {overview.map((item) => {
+      <GradeFilter
+        grades={overview.map((item) => item.grade)}
+        value={grade}
+        onChange={setGrade}
+      />
+      {overview
+        .filter((item) => grade === null || item.grade === grade)
+        .map((item) => {
         const share = item.tasks_total > 0 ? Math.round((item.tasks_solved / item.tasks_total) * 100) : 0;
         return (
           <Card key={item.grade} title={`${item.grade} класс`} hint={`Учеников: ${item.students}`}>

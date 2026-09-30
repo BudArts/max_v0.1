@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
 
-import { Bar, Card, EmptyState, ScreenLoader } from '../components/ui';
+import { Bar, Card, EmptyState, GradeFilter, ScreenLoader } from '../components/ui';
 import { api } from '../lib/api';
 import type { RiskStudent } from '../types';
 
 export function TeacherRiskPage(): JSX.Element {
   const [students, setStudents] = useState<RiskStudent[] | null>(null);
+  const [grade, setGrade] = useState<number | null>(null);
 
   useEffect(() => {
+    setStudents(null);
     void (async () => {
       try {
-        const data = await api.get<{ students: RiskStudent[] }>('/tutor/risk');
+        const query = grade === null ? '' : `?grades=${grade}`;
+        const data = await api.get<{ students: RiskStudent[] }>(`/tutor/risk${query}`);
         setStudents(data.students);
       } catch {
         setStudents([]);
       }
     })();
-  }, []);
+  }, [grade]);
 
   if (students === null) return <ScreenLoader label="Загрузка группы риска" />;
 
@@ -33,6 +36,7 @@ export function TeacherRiskPage(): JSX.Element {
 
   return (
     <div className="stack">
+      <GradeFilter grades={[5, 6, 7, 8, 9, 10, 11]} value={grade} onChange={setGrade} />
       <p className="muted">
         Ученики с тремя и более нерешёнными задачами за последние 7 дней. Стоит обсудить темы на
         уроке и поддержать учеников.

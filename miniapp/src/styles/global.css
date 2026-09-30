@@ -699,3 +699,26 @@ p {
 .bar__fill--success {
   background: var(--success);
 }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chip--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
