@@ -109,6 +109,29 @@ class MaxBotClient:
             raise MaxApiError("get_file", 0, "MAX API не вернул url файла")
         return str(url)
 
+    async def fetch_attachment(self, token: str, url: str | None = None) -> bytes:
+        client = await self.client()
+        if url:
+            response: httpx.Response | None = None
+            try:
+                response = await client.get(url, follow_redirects=True)
+            except (httpx.TransportError, httpx.TimeoutException) as exc:
+                log.warning("attachment_url_error", error=str(exc))
+            if response is not None and response.status_code < 400 and response.content:
+                return response.content
+            status = response.status_code if response is not None else 0
+            log.warning("attachment_url_failed", status=status)
+            if response is not None and response.status_code in {401, 403}:
+                retry = await client.get(
+                    url,
+                    headers={"Authorization": self._settings.max_bot_token},
+                    follow_redirects=True,
+                )
+                if retry.status_code < 400 and retry.content:
+                    return retry.content
+                log.warning("attachment_url_auth_failed", status=retry.status_code)
+        return await self.download_file(token)
+
     async def download_file(self, token: str) -> bytes:
         url = await self.get_file_url(token)
         client = await self.client()

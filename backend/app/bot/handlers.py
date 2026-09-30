@@ -423,14 +423,16 @@ def _role_label(role: UserRole) -> str:
     }[role]
 
 
-def _image_from_attachments(attachments: list[dict[str, Any]]) -> str | None:
+def _image_from_attachments(attachments: list[dict[str, Any]]) -> dict[str, str] | None:
     for attachment in attachments:
-        if attachment.get("type") != "image":
+        if attachment.get("type") not in {"image", "file"}:
             continue
         payload = attachment.get("payload") or {}
         token = payload.get("token") or payload.get("url")
         if token:
-            return str(token)
+            url = payload.get("url") or ""
+            log.info("image_attachment", has_url=bool(url))
+            return {"token": str(token), "url": str(url)}
     return None
 
 
@@ -518,9 +520,9 @@ async def _on_message(
         return
 
     problem = text
-    image_token = _image_from_attachments(event.attachments)
-    if image_token and not problem:
-        problem = await _recognize_image(runtime, image_token) or ""
+    image_ref = _image_from_attachments(event.attachments)
+    if image_ref and not problem:
+        problem = await _recognize_image(runtime, image_ref) or ""
         if not problem:
             await _send(runtime, event, OCR_FAILED, keyboard=_student_menu(profile))
             return
@@ -543,12 +545,13 @@ async def _on_message(
     await _send(runtime, event, turn.reply, keyboard=keyboard)
 
 
-async def _recognize_image(runtime: Runtime, token: str) -> str | None:
+async def _recognize_image(runtime: Runtime, file_ref: dict[str, str]) -> str | None:
     try:
-        data = await runtime.max_client.download_file(token)
+        data = await runtime.max_client.fetch_attachment(file_ref["token"], file_ref["url"] or None)
     except Exception as exc:
         log.warning("image_download_failed", error=str(exc))
         return None
+    log.info("image_downloaded", bytes=len(data))
     return image_to_text(data)
 
 
